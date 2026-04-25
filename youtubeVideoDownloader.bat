@@ -8,6 +8,8 @@ set audio_only=0
 set playlist=0
 set subtitles=0
 set metadata=0
+set Cookies(option)=0
+set YTDLSkip=0
 :: Quality Settings: 0=Best, 1=1080p, 2=720p
 set video_quality=1
 
@@ -19,10 +21,12 @@ echo ===================================================
 echo Toggle your desired options by pressing the number:
 echo.
 
-if !audio_only!==1 (echo   [1] Audio Only - MP3....... [ ON ]) else (echo   [1] Audio Only - MP3....... [ OFF ])
+if !audio_only!==1 (echo   [1] Audio Only - M4A....... [ ON ]) else (echo   [1] Audio Only - M4A....... [ OFF ])
 if !playlist!==1 (echo   [2] Download Playlist...... [ ON ]) else (echo   [2] Download Playlist...... [ OFF ])
 if !subtitles!==1 (echo   [3] Embed Subtitles........ [ ON ]) else (echo   [3] Embed Subtitles........ [ OFF ])
 if !metadata!==1 (echo   [4] Embed Metadata/Art..... [ ON ]) else (echo   [4] Embed Metadata/Art..... [ OFF ])
+if !Cookies!==1 (echo   [6] Search Cookies In Folder..... [ ON ]) else (echo   [6] Skip Search..... [ OFF ])
+if !YTDLSkip!==1 (echo   [7] Skip YTDL..... [ ON ]) else (echo   [7] Force YTDL..... [ OFF ])
 
 :: Quality display string logic
 if !video_quality!==0 set "vq_str=Best Available"
@@ -53,6 +57,14 @@ if /I "!choice!"=="4" (
     if !metadata!==1 (set metadata=0) else (set metadata=1)
     goto MENU
 )
+if /I "!choice!"=="6" (
+    if !Cookies!==1 (set Cookies=0) else (set Cookies=1)
+    goto MENU
+)
+if /I "!choice!"=="7" (
+    if !Archive!==1 (set Archive=0) else (set Archive=1)
+    goto MENU
+)
 if /I "!choice!"=="5" (
     :: Cycle through 0, 1, 2
     set /a video_quality+=1
@@ -79,10 +91,14 @@ if "!URL!"=="" goto MENU
 :COMPILE_ARGS
 set "ARGS="
 
-if !audio_only!==1 set "ARGS=!ARGS! -x --audio-format mp3"
+if !audio_only!==1 set "ARGS=!ARGS! -x --audio-format m4a"
 if !playlist!==1 (set "ARGS=!ARGS! --yes-playlist") else (set "ARGS=!ARGS! --no-playlist")
 if !subtitles!==1 set "ARGS=!ARGS! --embed-subs --write-auto-subs"
 if !metadata!==1 set "ARGS=!ARGS! --embed-metadata --embed-thumbnail"
+if !Cookies!==1 set "ARGS=!ARGS! --cookies cookies.json
+if !YTDLSkip!==1 set "ARGS=!ARGS! --download-archive
+if !YTDLSkip!==0 set "ARGS=!ARGS! --no-break-on-existing 
+
 
 :: Handle Quality Formatting (Enclosed safely in quotes for batch)
 set "FORMAT=bv*+ba/b"
